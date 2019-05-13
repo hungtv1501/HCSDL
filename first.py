@@ -28,7 +28,7 @@ y, sr = librosa.load(song, sr=16000)
 feat = extract_features(y)
 print(crop_feature(feat).shape)
 
-data_dir = './audio'
+data_dir = 'audio/a1.m4a'
 features = []
 songs = []
 
