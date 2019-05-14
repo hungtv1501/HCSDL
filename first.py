@@ -1,15 +1,13 @@
 import os
-import glob
+from glob import glob
 import librosa
+import librosa.display
 from tqdm import tqdm
 import numpy as np
-from python_speech_features import mfcc, fbank, logfbank
+from python_speech_features import mfcc, fbank, logfbank, delta
 from scipy.sparse import dok_matrix
-
-song = 'audio/a1.m4a'
-y, sr = librosa.load(song, sr=16000)
-# print(type(y), type(sr))
-# print(y.shape, sr)
+from matplotlib import pyplot as plt
+import scipy.io.wavfile as wav
 
 def extract_features(y, sr=16000, nfilt=10, winsteps=0.02):
     try:
@@ -24,10 +22,6 @@ def crop_feature(feat, i = 0, nb_step=10, maxlen=100):
     crop_feat = np.pad(crop_feat, (0, maxlen - len(crop_feat)), mode='constant')
     return crop_feat
 
-y, sr = librosa.load(song, sr=16000)
-feat = extract_features(y)
-print(crop_feature(feat).shape)
-
 data_dir = 'audio'
 features = []
 songs = []
@@ -37,8 +31,8 @@ for song in tqdm(os.listdir(data_dir)):
     y, sr = librosa.load(song, sr=16000)
     feat = extract_features(y)
     for i in range(0, feat.shape[0] - 10, 5):
-        features = features.append(crop_feature(feat, i, nb_step=10))
-        songs = songs.append(song)
+        features.append(crop_feature(feat, i, nb_step=10))
+        songs.append(song)
 
 import pickle
 
@@ -62,8 +56,8 @@ u = AnnoyIndex(f)
 
 u.load('music.ann')
 
-song = os.path.join(data_dir, 'a1.m4a')
-y, sr = read_song_frequency(song)
+song = ('a2.m4a')
+y, sr = librosa.load(song, sr=16000)
 feat = extract_features(y)
 
 results = []
@@ -78,11 +72,4 @@ results = np.array(results).flatten()
 from collections import Counter
 
 most_song = Counter(results)
-most_song.most_common()
-
-# audio_path = '../T08-violin.wav'
-# x , sr = librosa.load(audio_path)
-# print(type(x), type(sr))
-# <class 'numpy.ndarray'> <class 'int'>
-# print(x.shape, sr)
-# (396688,) 22050
+print(most_song.most_common()[0])
